@@ -1,4 +1,5 @@
-from math import log
+from std.math import log
+
 
 struct EvaluationEngine:
     """
@@ -22,20 +23,24 @@ struct EvaluationEngine:
     ) -> Float64:
         """
         Computes the QoE for a single video segment.
-        Formula: log(bitrate) - (beta * abs_change) - (gamma * stall_time)
+        Formula: alpha * log(bitrate) - (beta * abs_change) - (gamma * stall_time)
         """
-        # Quality utility: logarithmic for diminishing returns
-        var quality = log(bitrate)
+        var safe_bitrate = bitrate if bitrate > 0.0 else 1.0
+        var safe_prev_bitrate = previous_bitrate if previous_bitrate > 0.0 else 0.0
+        
+        # Quality utility: logarithmic for diminishing returns, scaled by alpha
+        var quality = self.alpha * log(safe_bitrate)
         
         # Switching penalty
         var switching_penalty: Float64 = 0.0
-        if previous_bitrate > 0:
-            switching_penalty = self.beta * abs(log(bitrate) - log(previous_bitrate))
+        if safe_prev_bitrate > 0.0:
+            switching_penalty = self.beta * abs(log(safe_bitrate) - log(safe_prev_bitrate))
             
         # Stalling penalty
         var stalling_penalty = self.gamma * stall_time
         
         return quality - switching_penalty - stalling_penalty
+
 
     def calculate_network_cost(
         self, 

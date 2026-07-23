@@ -1,0 +1,27 @@
+name: Ararat CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Pixi
+        uses: prefix-dev/setup-pixi@v0.8.1
+        with:
+          pixi-version: v0.73.0
+
+      - name: Run Python Automated Test Suite
+        run: pixi run python -m unittest discover -s tests
+
+      - name: Run Ararat Mojo Simulations
+        run: pixi run mojo run_use_cases.mojo
+
+      - name: Generate Evaluation Plot PDF
+        run: pixi run python scripts/generate_plots.py

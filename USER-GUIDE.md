@@ -4,7 +4,7 @@ This guide details how to create and manage custom Directed Hypergraph (DHG) top
 
 ## 1. YAML-Driven Automation (Recommended)
 
-The YAML-driven approach allows domain researchers to configure nodes and complex hyperedges without touching any underlying code. The `WorkflowParser` reads the YAML file and securely instantiates the required objects into the Ararat Orchestrator. 
+The YAML-driven approach allows domain researchers to configure nodes and complex hyperedges without touching any underlying code. The `WorkflowParser` reads the YAML file, validates schema definitions, unique IDs, platform options, and path safety, and instantiates the required objects into the Ararat Orchestrator.
 
 ### Step 1: Defining the YAML Schema
 Create a `.yaml` file within the `workflows/` directory. Your file must specify the global workflow name alongside two primary lists: `nodes` and `edges`.

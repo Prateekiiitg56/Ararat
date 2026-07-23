@@ -77,13 +77,13 @@ struct Neo4jOrchestrator:
 
     def check_cycles(self) raises -> Bool:
         """
-        Runs a cycle detection query to check if there are loop dependencies
+        Runs a cycle detection query with a depth cap to check if there are loop dependencies
         in the workflow. Returns True if a cycle is detected, otherwise False.
         """
         var session = self.driver.session()
         var builtins = Python.import_module("builtins")
         var cycle_query = (
-            "MATCH path = (n:ServiceNode)-[:OUTFLOW|INFLOW*]->(n) "
+            "MATCH path = (n:ServiceNode)-[:OUTFLOW|INFLOW*1..20]->(n) "
             "RETURN DISTINCT n.id AS id, n.name AS name, length(path) / 2 AS cycle_length"
         )
         var result = session.run(cycle_query)
@@ -101,12 +101,13 @@ struct Neo4jOrchestrator:
 
     def prune_downstream(self, session: PythonObject, failed_node_id: Int) raises:
         """
-        Finds all service nodes and hyperedges downstream of the failed node 
-        and updates their status to 'BLOCKED' to isolate the failure.
+        Finds service nodes and hyperedges downstream of the failed node (bounded to depth 20),
+        excluding loop predecessors, and updates their status to 'BLOCKED' to isolate the failure.
         """
         var prune_query = (
             "MATCH (failed:ServiceNode {id: $failed_node_id}) "
-            "MATCH path = (failed)-[:OUTFLOW|INFLOW*]->(downstream) "
+            "MATCH path = (failed)-[:OUTFLOW|INFLOW*1..20]->(downstream:ServiceNode) "
+            "WHERE downstream <> failed AND NOT (downstream)-[:OUTFLOW|INFLOW*1..20]->(failed) "
             "SET downstream.status = 'BLOCKED' "
             "RETURN downstream.id AS id, downstream.name AS name"
         )
@@ -122,6 +123,7 @@ struct Neo4jOrchestrator:
             var name = String(record["name"])
             var node_id = String(record["id"])
             print("   [Fault Isolation] -> Blocked downstream Node " + name + " (ID: " + node_id + ")")
+
 
     def _mark_node_completed(self, session: PythonObject, node_id: Int) raises:
         """

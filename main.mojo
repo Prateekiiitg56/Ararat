@@ -4,9 +4,18 @@ from src.infra.parser import WorkflowParser
 
 def run_workflow(yaml_path: String, iterations: Int = 5) raises:
     """
-    Utility function to load and execute a user-developed workflow.
+    Utility function to load and execute a user-developed workflow safely.
     This is exported and can be imported by other scripts using 'from main import run_workflow'.
     """
+    from std.python import Python
+    var os = Python.import_module("os")
+    
+    if not (yaml_path.endswith(".yaml") or yaml_path.endswith(".yml")):
+        raise Error("[Security Error] Workflow file must have a .yaml or .yml extension: " + yaml_path)
+
+    if not os.path.exists(yaml_path):
+        raise Error("[Error] Specified workflow file does not exist: " + yaml_path)
+
     print("[Ararat Framework] Initializing workflow execution...")
     var parser = WorkflowParser()
     var orchestrator = AraratOrchestrator()
@@ -16,6 +25,7 @@ def run_workflow(yaml_path: String, iterations: Int = 5) raises:
     
     orchestrator.initialize_workflow(nodes^, edges^)
     orchestrator.run_simulation(iterations)
+
 
 def main() raises:
     var args = sys.argv()

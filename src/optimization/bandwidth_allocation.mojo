@@ -11,25 +11,21 @@ struct BandwidthAllocator:
 
     def allocate_bandwidth(
         self, 
-        links: List[Link], 
+        mut links: List[Link], 
         source_id: Int, 
         dest_id: Int, 
         amount: Float64
     ) -> Bool:
         """
-        Allocates bandwidth on a specific link if available.
-        This is a simplified representation of the ARARAT bandwidth allocation strategy.
+        Allocates bandwidth on a specific link if available and subtracts the reserved amount.
         """
-        # Note: In a real implementation, we would use pointers or inout to modify the link
-        # For this skeleton, we represent the logic.
         for i in range(len(links)):
-            var link = links[i]
-            if link.source_id == source_id and link.dest_id == dest_id:
-                if link.available_bandwidth >= amount:
-                    # link.available_bandwidth -= amount 
-                    # (Requires mutable access to elements in List)
+            if links[i].source_id == source_id and links[i].dest_id == dest_id:
+                if links[i].available_bandwidth >= amount:
+                    links[i].available_bandwidth -= amount
                     return True
         return False
+
 
     def calculate_required_bandwidth(mut self, bitrate: Float64, safety_factor: Float64) -> Float64:
         """

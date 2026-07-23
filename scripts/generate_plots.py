@@ -58,6 +58,7 @@ ararat_stalls = np.array(ararat_stalls)
 centralized_bitrates = np.array(centralized_bitrates)
 centralized_stalls = np.array(centralized_stalls)
 
+alpha = 1.0
 beta = 1.0
 gamma = 4.3
 
@@ -65,13 +66,16 @@ def calculate_qoe(bitrates, stalls):
     qoe_scores = []
     prev_r = 0.0
     for r, t in zip(bitrates, stalls):
-        val = np.log(r)
+        safe_r = r if r > 0 else 1.0
+        val = alpha * np.log(safe_r)
         if prev_r > 0:
-            val -= beta * np.abs(np.log(r) - np.log(prev_r))
+            safe_prev_r = prev_r if prev_r > 0 else 1.0
+            val -= beta * np.abs(np.log(safe_r) - np.log(safe_prev_r))
         val -= gamma * t
         qoe_scores.append(val)
-        prev_r = r
+        prev_r = safe_r
     return qoe_scores
+
 
 ararat_qoe = calculate_qoe(ararat_bitrates, ararat_stalls)
 centralized_qoe = calculate_qoe(centralized_bitrates, centralized_stalls)

@@ -11,3 +11,6 @@ version = "0.1.0"
 mojo = ">=1.0.0b1.dev2026042505,<2"
 pyyaml = ">=6.0.3,<7"
 neo4j-python-driver = ">=6.2.0,<7"
+matplotlib = ">=3.8.0"
+numpy = ">=1.26.0"
+
