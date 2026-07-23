@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """
-Comprehensive automated test suite for Ararat framework.
-Tests parser validation, bandwidth allocation, QoE math, command launcher safety, and plot generation.
+Automated test suite for Ararat.
+Covers Python-side QoE math safety, basic YAML sample structure checks (via PyYAML), domain-script calculations, and plot generation.
 """
+
 import unittest
 import os
 import sys

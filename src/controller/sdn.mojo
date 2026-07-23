@@ -87,6 +87,10 @@ struct AraratOrchestrator:
         Orchestrates Algorithm 2: Service Executions across the DHG.
         Supports both Synchronous (Blocking) and Asynchronous (Thin) hyperedges.
         """
+        # Reset ACK signals for fresh pass
+        for k in range(len(self.nodes)):
+            self.ack_signals[self.nodes[k].id] = False
+
         for i in range(len(self.nodes)):
             var node = self.nodes[i].copy()
             
@@ -130,6 +134,7 @@ struct AraratOrchestrator:
                     for j in range(len(edge.destination_ids)):
                         var dest_id = edge.destination_ids[j]
                         self.emit_control_event(dest_id, "DATA_AVAILABLE")
+                        # Destination signals receipt confirmation
                         self.emit_control_event(dest_id, "ACK_RECEIVED")
                         if not self.ack_signals.get(dest_id, False):
                             all_acked = False
@@ -142,4 +147,5 @@ struct AraratOrchestrator:
                     edge.display()
                     for j in range(len(edge.destination_ids)):
                         self.emit_control_event(edge.destination_ids[j], "DATA_AVAILABLE")
+
 

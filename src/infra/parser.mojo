@@ -59,8 +59,11 @@ struct WorkflowParser:
         var nodes = List[WorkflowNode]()
         var seen_node_ids = List[Int]()
         var yaml_nodes = data["nodes"]
+        if not builtins.isinstance(yaml_nodes, builtins.list):
+            raise Error("[Parser Error] 'nodes' section must be a list in workflow file: " + yaml_path)
         
         for i in range(len(yaml_nodes)):
+
             var y_node = yaml_nodes[i]
             if "id" not in y_node:
                 raise Error("[Parser Error] Node at index " + String(i) + " is missing required field 'id'")
@@ -120,8 +123,11 @@ struct WorkflowParser:
         var edges = List[Hyperedge]()
         var seen_edge_ids = List[Int]()
         var yaml_edges = data["edges"]
+        if not builtins.isinstance(yaml_edges, builtins.list):
+            raise Error("[Parser Error] 'edges' section must be a list in workflow file: " + yaml_path)
         
         for i in range(len(yaml_edges)):
+
             var y_edge = yaml_edges[i]
             if "id" not in y_edge or "label" not in y_edge or "source" not in y_edge or "destinations" not in y_edge:
                 raise Error("[Parser Error] Hyperedge at index " + String(i) + " is missing required fields (id, label, source, destinations)")

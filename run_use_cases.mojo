@@ -116,9 +116,15 @@ def run_neo4j_sim() raises:
     var os = Python.import_module("os")
     var uri = String(os.getenv("NEO4J_URI", "bolt://localhost:7687"))
     var user = String(os.getenv("NEO4J_USER", "neo4j"))
-    var password = String(os.getenv("NEO4J_PASSWORD", "password"))
+    var password = String(os.getenv("NEO4J_PASSWORD", ""))
+    if password == "":
+        print("   [Simulator] ERROR: NEO4J_PASSWORD environment variable is not set.")
+        print("   [Simulator] Please set NEO4J_PASSWORD in environment (e.g. export NEO4J_PASSWORD=password).")
+        return
+
     try:
         var orchestrator = Neo4jOrchestrator(uri, user, password)
+
 
 
         
