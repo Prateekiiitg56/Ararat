@@ -40,12 +40,25 @@ struct ServiceLauncher:
             for i in range(len(param_args)):
                 cmd_list.append(param_args[i])
 
-        try:
-            subprocess.run(cmd_list, shell=False, check=True)
-            print("   [Launcher] Service execution completed successfully.")
-        except err:
-            print("   [Launcher] ERROR: Service execution failed for " + image + ": " + String(err))
-            raise err^
+        var max_retries = 3
+        var attempt = 0
+        var success = False
+        var last_error = Error("Service execution failed")
+        
+        while attempt < max_retries and not success:
+            attempt += 1
+            try:
+                if attempt > 1:
+                    print("   [Launcher] Retry attempt " + String(attempt) + "/" + String(max_retries) + " for " + image)
+                subprocess.run(cmd_list, shell=False, check=True)
+                print("   [Launcher] Service execution completed successfully.")
+                success = True
+            except err:
+                last_error = Error(String(err))
+                if attempt == max_retries:
+                    print("   [Launcher] ERROR: All " + String(max_retries) + " attempts failed for " + image + ": " + String(err))
+                    raise last_error^
+
 
 
     def exec_shell_script(mut self, script_path: String) raises:
